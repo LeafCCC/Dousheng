@@ -39,7 +39,7 @@ func initUserRpc() {
 	userClient = c
 }
 
-// CreateUser create user info
+// 创建用户
 func CreateUser(ctx context.Context, req *userdemo.CreateUserRequest) error {
 	resp, err := userClient.CreateUser(ctx, req)
 	if err != nil {
@@ -51,7 +51,7 @@ func CreateUser(ctx context.Context, req *userdemo.CreateUserRequest) error {
 	return nil
 }
 
-// CheckUser check user info
+// 校验用户 返回UserId
 func CheckUser(ctx context.Context, req *userdemo.CheckUserRequest) (int64, error) {
 	resp, err := userClient.CheckUser(ctx, req)
 	if err != nil {
@@ -62,3 +62,30 @@ func CheckUser(ctx context.Context, req *userdemo.CheckUserRequest) (int64, erro
 	}
 	return resp.UserId, nil
 }
+
+// 校验用户 返回UserId 以及查询的状态玛
+func QueryUser(ctx context.Context, req *userdemo.CheckUserRequest) (int64, errno.ErrNo) {
+	resp, err := userClient.CheckUser(ctx, req)
+	if err != nil {
+		return 0, errno.ConvertErr(err)
+	}
+	if resp.BaseResp.StatusCode != 0 {
+		return 0, errno.NewErrNo(resp.BaseResp.StatusCode, resp.BaseResp.StatusMsg)
+	}
+	return resp.UserId, errno.NewErrNo(resp.BaseResp.StatusCode, resp.BaseResp.StatusMsg)
+}
+
+//获取用户信息
+// InfoGet get user info
+func InfoGetUser(ctx context.Context, req *userdemo.InfoGetUserRequest) (*userdemo.User, error) {
+	resp, err := userClient.InfoGetUser(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.BaseResp.StatusCode != 0 {
+		return nil, errno.NewErrNo(resp.BaseResp.StatusCode, resp.BaseResp.StatusMsg)
+	}
+	return resp.User, nil
+}
+
+//
